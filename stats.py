@@ -6,8 +6,10 @@
   「可验证」和「我记下来了」是两件事。
 
 数据来源：E:\\wechatauto\\work 下的发送记录（本人账号，内部效率工具，不对外）
+> 数据来源：本人账号上的内部效率工具，不对外。仓库不放真实路径，用环境变量指定。
 用法：
-  python stats.py                     # 打印统计
+  set WX_DATA_DIR=<你的发送记录目录>
+  python stats.py                     # 打印统计（没有数据时自动进演示模式）
   python stats.py --sample 20         # 导出 20 条脱敏样例，用于公开分享
 """
 import argparse
@@ -17,7 +19,7 @@ import io
 import os
 import re
 
-DATA = r"E:\wechatauto\work"
+DATA = os.environ.get("WX_DATA_DIR", r"<path>\work")
 HERE = os.path.dirname(os.path.abspath(__file__))
 SAMPLE = os.path.join(HERE, "sample_sent.csv")
 
