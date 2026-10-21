@@ -19,6 +19,10 @@ import re
 
 DATA = r"E:\wechatauto\work"
 HERE = os.path.dirname(os.path.abspath(__file__))
+SAMPLE = os.path.join(HERE, "sample_sent.csv")
+
+# 本地没有原始数据时（别人 clone 下来跑），自动进入演示模式，读仓库里的脱敏样例
+DEMO = not os.path.isdir(DATA)
 
 GROUPS = [
     ("转发", "转发_发送记录.csv"),
@@ -38,10 +42,14 @@ COMPANY_HINT = re.compile(
 
 def load(name):
     p = os.path.join(DATA, name)
-    if not os.path.exists(p):
-        return None
-    raw = open(p, encoding="utf-8-sig", errors="replace").read()
-    return list(csv.DictReader(io.StringIO(raw)))
+    if os.path.exists(p):
+        raw = open(p, encoding="utf-8-sig", errors="replace").read()
+        return list(csv.DictReader(io.StringIO(raw)))
+    # 演示模式：所有组都读仓库里的脱敏样例
+    if DEMO and os.path.exists(SAMPLE):
+        raw = open(SAMPLE, encoding="utf-8-sig", errors="replace").read()
+        return list(csv.DictReader(io.StringIO(raw)))
+    return None
 
 
 def classify(rows):
@@ -73,6 +81,10 @@ def main():
     print("=" * 66)
     print("微信批量触达 · 从原始发送记录复算")
     print("=" * 66)
+    if DEMO:
+        print("⚠ 未找到本地原始数据，进入演示模式：读仓库里的 20 条脱敏样例。")
+        print("  下面所有数字都是样例数据的，不代表真实运行结果。")
+        print("  真实的统计需要把 DATA 指向自己的发送记录目录。\n")
     print(f"{'组':16s} {'目标':>6s} {'已送达':>7s} {'未完成':>7s} {'送达率':>8s} {'状态':>6s}")
     print("-" * 66)
 
